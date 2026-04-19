@@ -27,8 +27,8 @@ class Config:
     IP_PATTERN = "10.0.48.\\d+"  # IP 查找正则表达式，用于从 ARP 表中匹配 IP 地址
     
     # 数据保留配置
-    DATA_RETENTION_SECONDS = 15552000  # 数据保留时间（秒），默认 15552000 秒（6个月）
-    AUTO_CLEANUP_INTERVAL = 3600  # 自动清理间隔（秒），默认 3600 秒（1小时）
+    DATA_RETENTION_SECONDS = 6 * 30 * 24 * 60 * 60  # 数据保留时间（秒），6个月 = 6 * 30天 * 24小时 * 60分钟 * 60秒
+    AUTO_CLEANUP_INTERVAL = 1 * 24 * 60 * 60  # 自动清理间隔（秒），1天 = 1 * 24小时 * 60分钟 * 60秒
     
     # Flask 运行配置
     FLASK_HOST = '0.0.0.0'
