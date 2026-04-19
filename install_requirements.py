@@ -31,6 +31,7 @@ download_source = "https://pypi.tuna.tsinghua.edu.cn/simple"
 # 需要安装的包列表（包含所有依赖包及指定版本号）
 packages = [
     "flask==3.1.2",           # Flask Web 框架
+    "flask_cors==6.0.2",      # Flask CORS 跨域支持
     "apscheduler==3.11.1",    # APScheduler 定时任务调度器
     "werkzeug==3.1.4",        # Werkzeug WSGI 工具库
     "jinja2==3.1.6",          # Jinja2 模板引擎
