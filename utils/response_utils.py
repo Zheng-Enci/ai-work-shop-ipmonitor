@@ -4,7 +4,7 @@ API 统一响应工具类
 提供标准化的 API 响应格式，包括成功响应和错误响应。
 """
 
-from typing import Any, Optional
+from typing import Any
 
 
 class APIResponse:
