@@ -1,6 +1,6 @@
 # AiWorkShop IP 监控系统
 
-一个基于 Flask 的网络 IP 监控系统，用于实时监控和统计指定 IP 范围的在线状态，并提供可视化的 Web 界面展示。
+一个基于 Flask 的网络 IP 监控系统，用于实时监控和统计指定 IP 范围的在线状态，提供可视化的 Web 界面展示和 RESTful API 接口。
 
 ## 项目背景
 
@@ -14,6 +14,7 @@
 
 ## 功能特性
 
+### Web 版本 (app.py)
 - 🔍 **自动网络扫描**：每 60 秒自动扫描指定 IP 范围（10.0.48.151-250）
 - 📊 **IP 统计可视化**：通过热力图展示 IP 出现次数统计
 - 🎨 **交互式颜色筛选**：点击颜色横条可筛选特定次数范围的 IP，高亮显示匹配项
@@ -21,6 +22,15 @@
 - 📈 **历史数据统计**：统计最近 7 天的扫描次数
 - 🔄 **自动数据刷新**：页面每分钟自动刷新，无需手动操作
 - 💻 **美观的 Web 界面**：响应式设计，现代化 UI
+
+### API 版本 (app_api_only.py)
+- 🔌 **RESTful API 接口**：提供标准化的 JSON 接口
+- 🌐 **CORS 跨域支持**：支持跨域请求，方便前端调用
+- 📊 **IP 出现次数统计**：按时间范围统计每个 IP 的出现次数
+- 🔢 **扫描次数查询**：获取指定时间范围内的扫描次数
+- 📋 **坊内 IP 列表**：获取配置中定义的坊内 IP 地址
+- 🌐 **IP 范围查询**：获取扫描的 IP 范围配置
+- ✅ **统一响应格式**：所有接口返回统一的 code/message/data 格式
 
 ## 系统要求
 
@@ -54,19 +64,169 @@ python install_requirements.py
 3. 切换到项目目录
 4. 运行以下命令：
 
+#### 启动 Web 版本（带可视化界面）
 ```bash
 python app.py
 ```
 
-应用将在 `http://0.0.0.0:5000` 启动，你可以在浏览器中访问该地址查看 IP 监控界面。
+#### 启动 API 版本（仅提供接口）
+```bash
+python app_api_only.py
+```
+
+应用将在 `http://0.0.0.0:5000` 启动。
 
 > ⚠️ **注意**：清除 ARP 缓存命令需要管理员权限。如果没有管理员权限，ARP 缓存清除功能将失败，可能影响扫描结果的准确性。
+
+## API 接口文档
+
+### 基础信息
+
+- **Base URL**: `http://localhost:5000` 或 `http://10.0.48.241:5000`
+- **响应格式**: JSON
+- **统一响应结构**:
+  ```json
+  {
+    "code": 200,
+    "message": "操作成功",
+    "data": { ... }
+  }
+  ```
+
+### 接口列表
+
+#### 1. 获取 IP 出现次数统计
+
+获取指定时间范围内每个 IP 出现的次数统计。
+
+- **URL**: `/api/ip-counts`
+- **Method**: `GET`
+- **参数**:
+  | 参数名 | 类型 | 必填 | 说明 |
+  |--------|------|------|------|
+  | start_time | float | 是 | 开始时间戳（Unix 时间戳，秒） |
+  | end_time | float | 是 | 结束时间戳（Unix 时间戳，秒） |
+
+- **示例请求**:
+  ```
+  GET http://10.0.48.241:5000/api/ip-counts?start_time=0&end_time=9999999999
+  ```
+
+- **成功响应**:
+  ```json
+  {
+    "code": 200,
+    "message": "查询成功",
+    "data": {
+      "total_scans": 15,
+      "ip_counts": {
+        "10.0.48.241": 15,
+        "10.0.48.153": 12,
+        "10.0.48.154": 10
+      }
+    }
+  }
+  ```
+
+#### 2. 获取扫描次数
+
+获取指定时间范围内的扫描次数。
+
+- **URL**: `/api/scan-count`
+- **Method**: `GET`
+- **参数**:
+  | 参数名 | 类型 | 必填 | 说明 |
+  |--------|------|------|------|
+  | start_time | float | 是 | 开始时间戳（Unix 时间戳，秒） |
+  | end_time | float | 是 | 结束时间戳（Unix 时间戳，秒） |
+
+- **示例请求**:
+  ```
+  GET http://10.0.48.241:5000/api/scan-count?start_time=0&end_time=9999999999
+  ```
+
+- **成功响应**:
+  ```json
+  {
+    "code": 200,
+    "message": "查询成功",
+    "data": {
+      "scan_count": 15
+    }
+  }
+  ```
+
+#### 3. 获取坊内 IP 列表
+
+获取配置中定义的坊内 IP 地址列表。
+
+- **URL**: `/api/fang-ips`
+- **Method**: `GET`
+- **参数**: 无
+
+- **示例请求**:
+  ```
+  GET http://10.0.48.241:5000/api/fang-ips
+  ```
+
+- **成功响应**:
+  ```json
+  {
+    "code": 200,
+    "message": "获取坊内 IP 列表成功",
+    "data": {
+      "fang_ips": ["10.0.48.153", "10.0.48.154", "..."],
+      "count": 47
+    }
+  }
+  ```
+
+#### 4. 获取 IP 范围
+
+获取配置中定义的扫描 IP 范围。
+
+- **URL**: `/api/ip-range`
+- **Method**: `GET`
+- **参数**: 无
+
+- **示例请求**:
+  ```
+  GET http://10.0.48.241:5000/api/ip-range
+  ```
+
+- **成功响应**:
+  ```json
+  {
+    "code": 200,
+    "message": "获取 IP 范围成功",
+    "data": {
+      "ip_range": ["10.0.48.151", "10.0.48.152", "..."],
+      "count": 100,
+      "start_ip": "10.0.48.151",
+      "end_ip": "10.0.48.250"
+    }
+  }
+  ```
+
+### 错误响应
+
+当请求参数错误或发生其他错误时，接口会返回相应的错误信息：
+
+```json
+{
+  "code": 400,
+  "message": "缺少必要参数：start_time 和 end_time",
+  "data": null
+}
+```
 
 ## 项目结构
 
 ```
 AiWorkShopIPMonitor/
-├── app.py                    # Flask 应用主文件
+├── app.py                    # Flask Web 应用主文件（带可视化界面）
+├── app_api_only.py           # Flask API 应用主文件（仅提供接口）
+├── app_no_web.py             # 无 Web 界面的纯后台扫描程序
 ├── config.py                 # 项目配置文件（IP范围、Flask配置等）
 ├── install_requirements.py   # 依赖安装脚本
 ├── activate_ip.txt           # IP 扫描结果数据文件（自动生成）
@@ -76,7 +236,9 @@ AiWorkShopIPMonitor/
     ├── __init__.py
     ├── network_scanner.py    # 网络扫描器模块
     ├── stats_utils.py        # IP 统计工具模块
-    └── file_utils.py         # 线程安全的文件操作模块
+    ├── file_utils.py         # 线程安全的文件操作模块
+    ├── admin_utils.py        # 管理员权限检测模块
+    └── response_utils.py     # API 统一响应格式模块
 ```
 
 ## 核心模块说明
@@ -92,11 +254,25 @@ AiWorkShopIPMonitor/
 - 读取并解析扫描数据
 - 统计每个 IP 的出现次数
 - 计算最近 7 天的扫描次数
+- 按时间范围统计 IP 出现次数
+- 按时间范围统计扫描次数
+
+### APIResponse（API 统一响应）
+
+- 提供标准化的 API 响应格式
+- 支持成功响应和多种错误响应
+- 包含 code、message、data 三个字段
 
 ### FileHandler（文件处理器）
 
 - 提供线程安全的文件读写操作
 - 确保多线程环境下的数据一致性
+
+### AdminChecker（管理员权限检测）
+
+- 检测当前程序是否以管理员身份运行
+- 自动以管理员身份重新启动程序
+- 支持打包成 EXE 后使用（通过检查管理员权限令牌）
 
 ## 配置说明
 
@@ -106,8 +282,7 @@ AiWorkShopIPMonitor/
 
 ```python
 class Config:
-    # 属于自己的IP范围定义（需要监控和管理的IP地址范围）
-    # 这些IP地址属于你的网络环境，需要统计使用频率
+    # 坊内IP定义（需要重点监控的IP地址）
     FANG_IPS = []
     FANG_IPS.extend(range(153, 175))
     FANG_IPS.extend(range(176, 181))
@@ -165,11 +340,23 @@ class Config:
     ACTIVATE_IP_FILE_PATH = os.path.join(os.path.dirname(__file__), 'activate_ip.txt')
 ```
 
+### 数据保留配置
+
+在 `config.py` 中可以修改数据保留时间和自动清理间隔：
+
+```python
+class Config:
+    # 数据保留配置
+    DATA_RETENTION_SECONDS = 6 * 30 * 24 * 60 * 60  # 数据保留时间（秒），6个月
+    AUTO_CLEANUP_INTERVAL = 1 * 24 * 60 * 60  # 自动清理间隔（秒），1天
+```
+
 ## 依赖包列表
 
 项目使用以下 Python 包（已指定版本）：
 
 - Flask 3.1.2
+- flask-cors 6.0.2
 - APScheduler 3.11.1
 - Werkzeug 3.1.4
 - Jinja2 3.1.6
@@ -183,11 +370,19 @@ class Config:
 
 ## 使用说明
 
-1. **以管理员权限启动服务**：以管理员身份运行命令提示符或 PowerShell，然后运行 `python app.py` 启动 Web 服务（清除 ARP 缓存需要管理员权限）
+### Web 版本
+
+1. **以管理员权限启动服务**：以管理员身份运行命令提示符或 PowerShell，然后运行 `python app.py` 启动 Web 服务
 2. **访问界面**：在浏览器中打开 `http://localhost:5000`
 3. **查看统计**：界面会显示 IP 出现次数的热力图
 4. **使用颜色筛选**：点击颜色横条上的不同颜色块，可以筛选显示特定次数范围的 IP
 5. **自动刷新**：页面每分钟自动刷新一次，获取最新数据
+
+### API 版本
+
+1. **以管理员权限启动服务**：运行 `python app_api_only.py`
+2. **调用 API**：使用浏览器、Postman 或代码调用 API 接口
+3. **查看数据**：获取 JSON 格式的 IP 统计数据
 
 > 💡 **提示**：如果扫描结果不准确，请确认是否以管理员权限运行程序（ARP 缓存清除需要管理员权限）。
 
@@ -201,12 +396,25 @@ class Config:
 - **统计信息**：显示最近 7 天的扫描次数
 - **自动刷新**：页面每分钟自动刷新，无需手动操作
 
-## 注意事项
+## 打包成 EXE
 
-1. **⚠️ 管理员权限要求**：**清除 ARP 缓存需要管理员权限**。程序中的 `arp -d` 命令用于清除 ARP 缓存，该命令在 Windows 系统中需要管理员权限。如果没有管理员权限，ARP 缓存清除将失败，可能导致扫描结果不准确。其他功能（ping、读取 ARP 表、Web 服务等）无需管理员权限。
-2. **防火墙**：确保防火墙允许 ping 操作
-3. **数据文件**：`activate_ip.txt` 文件会持续增长，建议定期清理或归档
-4. **Python 版本**：建议使用 Python 3.13，其他版本可能出现兼容性问题
+### 关于 admin_utils.py 在 EXE 中的有效性
+
+`admin_utils.py` 在打包成 EXE 后**仍然有效**，但需要注意以下几点：
+
+1. **管理员权限检测**：使用 Windows API (`ctypes.windll.shell32.IsUserAnAdmin()`) 检测管理员权限，这在 EXE 中同样有效
+2. **自动提权**：`restart_as_admin()` 方法会以管理员身份重新启动程序，在 EXE 中会弹出 UAC 提示框
+3. **打包建议**：使用 PyInstaller 打包时，建议添加 `--uac-admin` 参数，让 EXE 默认请求管理员权限
+
+### 打包命令示例
+
+```bash
+# 使用 PyInstaller 打包
+pyinstaller --onefile --uac-admin app_api_only.py
+
+# 或打包 Web 版本
+pyinstaller --onefile --uac-admin app.py
+```
 
 ## 故障排除
 
@@ -223,6 +431,12 @@ class Config:
 - 检查端口 5000 是否被占用
 - 确认防火墙允许访问该端口
 - 尝试使用 `127.0.0.1:5000` 而不是 `0.0.0.0:5000`
+
+### 问题：API 接口返回 404
+
+- 确认运行的是 `app_api_only.py` 而不是 `app.py`
+- 检查 URL 路径是否正确（如 `/api/ip-counts`）
+- 确认程序已正常启动，没有报错
 
 ### 问题：依赖安装失败
 
@@ -269,6 +483,14 @@ class Config:
 
 ### 最新版本
 
+- ✅ 添加 API 版本支持：提供 RESTful API 接口
+- ✅ 添加 CORS 跨域支持：支持前端跨域调用
+- ✅ 添加统一响应格式：所有接口返回 code/message/data 格式
+- ✅ 新增 API 接口：
+  - `/api/ip-counts` - 获取 IP 出现次数统计
+  - `/api/scan-count` - 获取扫描次数
+  - `/api/fang-ips` - 获取坊内 IP 列表
+  - `/api/ip-range` - 获取 IP 范围
 - ✅ 添加交互式颜色筛选器：点击颜色横条可筛选特定次数范围的 IP
 - ✅ 颜色横条显示次数范围：每个颜色块下方显示对应的次数范围标签
 - ✅ 自动数据刷新：页面每分钟自动刷新，无需手动操作
@@ -282,4 +504,3 @@ class Config:
 ---
 
 如有问题或建议，欢迎反馈！
-
