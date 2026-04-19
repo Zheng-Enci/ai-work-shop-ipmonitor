@@ -77,5 +77,48 @@ def get_ip_counts():
     return jsonify(APIResponse.success(data=data, message='查询成功'))
 
 
+@app.route('/api/fang-ips', methods=['GET'])
+def get_fang_ips():
+    """
+    获取坊内 IP 列表
+    
+    返回配置中定义的坊内 IP 地址列表。
+    
+    Returns:
+        JSON 格式的坊内 IP 列表
+    """
+    # 从配置中获取坊内 IP 列表
+    fang_ips = [f"10.0.48.{ip}" for ip in Config.FANG_IPS]
+    
+    return jsonify(APIResponse.success(
+        data={'fang_ips': fang_ips, 'count': len(fang_ips)},
+        message='获取坊内 IP 列表成功'
+    ))
+
+
+@app.route('/api/ip-range', methods=['GET'])
+def get_ip_range():
+    """
+    获取扫描 IP 范围
+    
+    返回配置中定义的扫描 IP 范围。
+    
+    Returns:
+        JSON 格式的 IP 范围信息
+    """
+    # 从配置中获取 IP 范围
+    ip_range = [f"10.0.48.{ip}" for ip in Config.IP_RANGE]
+    
+    return jsonify(APIResponse.success(
+        data={
+            'ip_range': ip_range,
+            'count': len(ip_range),
+            'start_ip': f"10.0.48.{min(Config.IP_RANGE)}",
+            'end_ip': f"10.0.48.{max(Config.IP_RANGE)}"
+        },
+        message='获取 IP 范围成功'
+    ))
+
+
 if __name__ == '__main__':
     app.run(host=Config.FLASK_HOST, port=Config.FLASK_PORT, debug=Config.FLASK_DEBUG)
