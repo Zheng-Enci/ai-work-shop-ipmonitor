@@ -6,10 +6,6 @@ import os
 import sys
 import threading
 import time
-from colorama import init, Fore, Style
-
-# 初始化 colorama（Windows 系统需要）
-init(autoreset = True)
 
 # 指定的 Python 版本
 python_version = "3.13"
@@ -17,17 +13,16 @@ python_version = "3.13"
 # 检查 Python 版本
 current_version = f"{sys.version_info.major}.{sys.version_info.minor}"
 if current_version != python_version:
-    print(f"{Fore.RED}⚠ 警告：当前 Python 版本为 {current_version}，但项目指定版本为 {python_version}")
-    print(f"{Fore.RED}可能存在的问题：")
-    print(f"{Fore.RED}  - 某些包可能不兼容当前 Python 版本")
-    print(f"{Fore.RED}  - 安装过程中可能出现依赖冲突")
-    print(f"{Fore.RED}  - 运行时可能出现语法或功能错误")
-    print(f"{Fore.RED}  - 建议使用 Python {python_version} 以确保最佳兼容性")
-    print(f"{Style.RESET_ALL}")
+    print(f"警告：当前 Python 版本为 {current_version}，但项目指定版本为 {python_version}")
+    print("可能存在的问题：")
+    print("  - 某些包可能不兼容当前 Python 版本")
+    print("  - 安装过程中可能出现依赖冲突")
+    print("  - 运行时可能出现语法或功能错误")
+    print(f"  - 建议使用 Python {python_version} 以确保最佳兼容性")
 
     user_input = input("是否继续安装？(y/n): ").strip().lower()
     if user_input != "y":
-        print(f"{Fore.GREEN}安装已取消{Style.RESET_ALL}")
+        print("安装已取消")
         sys.exit(0)
 
 # 配置下载源（使用清华镜像源加速下载）
@@ -45,7 +40,6 @@ packages = [
     "blinker==1.9.0",         # Blinker 信号库
     "tzlocal==5.3.1",         # tzlocal 时区库
     "tzdata==2025.2",         # tzdata 时区数据
-    "colorama==0.4.6",        # Colorama 终端颜色输出支持
 ]
 
 # 为每个包创建线程并行安装
@@ -88,3 +82,4 @@ while True:
 
 # 安装完成后换行，使输出更清晰
 print()
+print("安装完成！")
