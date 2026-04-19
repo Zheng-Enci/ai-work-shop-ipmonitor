@@ -2,6 +2,8 @@ from utils.file_utils import FileHandler
 from typing import Optional
 from collections import Counter
 from datetime import datetime, timedelta
+import threading
+import time
 
 
 class ActivateIPData:
@@ -89,20 +91,40 @@ class ActivateIPData:
         
         return scan_count
     
-    def clean_old_data(self, seconds: int = 2592000) -> int:
+    def _cleanup_worker(self, file_handler: FileHandler, seconds: int, interval: int) -> None:
         """
-        清理超过指定秒数的历史数据
+        清理工作线程函数
         
-        删除 activate_ip.txt 文件中时间戳与当前时间差大于指定秒数的数据行。
+        在后台定期执行数据清理任务。
         
         Args:
-            seconds: 秒数阈值，默认为 2592000 秒（30天）
+            file_handler: 文件处理器实例（独立的，避免与主线程冲突）
+            seconds: 秒数阈值，超过此时间的数据将被删除
+            interval: 清理间隔（秒）
+        """
+        while True:
+            try:
+                self._do_cleanup(file_handler, seconds)
+            except Exception as e:
+                # 清理过程中出现异常，记录错误但不影响线程继续运行
+                print(f"[清理线程] 清理数据时出错: {e}")
+            
+            # 等待指定的间隔时间
+            time.sleep(interval)
+    
+    def _do_cleanup(self, file_handler: FileHandler, seconds: int) -> int:
+        """
+        执行实际的清理操作
+        
+        Args:
+            file_handler: 文件处理器实例
+            seconds: 秒数阈值
             
         Returns:
             int: 删除的行数
         """
         # 读取所有数据
-        content = self.file_handler.read_file_content(self.file_path)
+        content = file_handler.read_file_content(self.file_path)
         lines = [line.strip() for line in content.split('\n') if line.strip()]
         
         # 计算截止时间戳（当前时间减去指定秒数）
@@ -129,6 +151,29 @@ class ActivateIPData:
         if deleted_count > 0:
             # 将保留的数据写入文件（覆盖原有内容）
             new_content = '\n'.join(new_lines) + '\n' if new_lines else ''
-            self.file_handler.write_file(self.file_path, new_content, mode='w')
+            file_handler.write_file(self.file_path, new_content, mode='w')
+            print(f"[清理线程] 已清理 {deleted_count} 行过期数据")
         
         return deleted_count
+    
+    def start_auto_cleanup(self, file_handler: FileHandler, seconds: int = 2592000, interval: int = 3600) -> None:
+        """
+        启动自动清理线程
+        
+        创建一个后台守护线程，定期清理超过指定秒数的历史数据。
+        该线程不会阻碍主线程的运行，主线程退出时自动结束。
+        
+        Args:
+            file_handler: 文件处理器实例（建议传入独立的实例以避免冲突）
+            seconds: 秒数阈值，默认为 2592000 秒（30天）
+            interval: 清理间隔（秒），默认为 3600 秒（1小时）
+        """
+        # 创建并启动清理线程
+        cleanup_thread = threading.Thread(
+            target=self._cleanup_worker,
+            args=(file_handler, seconds, interval),
+            name="DataCleanupThread",
+            daemon=True  # 设置为守护线程，主线程退出时自动结束
+        )
+        cleanup_thread.start()
+        print(f"[清理线程] 已启动，每隔 {interval} 秒清理一次超过 {seconds} 秒的数据")
