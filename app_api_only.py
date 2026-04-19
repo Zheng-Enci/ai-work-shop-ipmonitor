@@ -120,5 +120,42 @@ def get_ip_range():
     ))
 
 
+@app.route('/api/scan-count', methods=['GET'])
+def get_scan_count():
+    """
+    获取指定时间范围内的扫描次数
+    
+    通过 GET 请求传入开始时间戳和结束时间戳，返回该时间范围内的扫描次数。
+    
+    请求参数:
+        start_time: 开始时间戳（Unix 时间戳，秒）
+        end_time: 结束时间戳（Unix 时间戳，秒）
+    
+    Returns:
+        JSON 格式的扫描次数
+    """
+    # 获取请求参数
+    start_time_str = request.args.get('start_time')
+    end_time_str = request.args.get('end_time')
+    
+    # 参数验证
+    if not start_time_str or not end_time_str:
+        return jsonify(APIResponse.bad_request(message='缺少必要参数：start_time 和 end_time')), 400
+    
+    try:
+        start_time = float(start_time_str)
+        end_time = float(end_time_str)
+    except ValueError:
+        return jsonify(APIResponse.bad_request(message='时间戳格式错误，必须是数字')), 400
+    
+    # 使用 ActivateIPData 获取时间范围内的扫描次数
+    scan_count = activate_ip_data.get_scan_count_by_time_range(start_time, end_time)
+    
+    return jsonify(APIResponse.success(
+        data={'scan_count': scan_count},
+        message='查询成功'
+    ))
+
+
 if __name__ == '__main__':
     app.run(host=Config.FLASK_HOST, port=Config.FLASK_PORT, debug=Config.FLASK_DEBUG)
