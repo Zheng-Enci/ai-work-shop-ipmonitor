@@ -6,7 +6,6 @@
 """
 
 import ctypes
-import os
 import sys
 
 
@@ -29,7 +28,9 @@ class AdminChecker:
         try:
             # Windows 系统使用 ctypes 检查管理员权限
             return ctypes.windll.shell32.IsUserAnAdmin()
-        except Exception:
+        except (AttributeError, OSError):
+            # AttributeError: 函数不存在（非 Windows 系统）
+            # OSError: 调用失败
             # 如果检测失败，默认返回 False
             return False
     
