@@ -22,13 +22,11 @@ file_handler = FileHandler(file_path=Config.ACTIVATE_IP_FILE_PATH)
 # 启动网络扫描器
 NetworkScanner(file_handler=file_handler, file_path=Config.ACTIVATE_IP_FILE_PATH)
 
-# 创建独立的文件处理器实例用于数据清理（避免与主线程冲突）
-cleanup_file_handler = FileHandler(file_path=Config.ACTIVATE_IP_FILE_PATH)
-
 # 创建 ActivateIPData 实例并启动自动清理线程
-activate_ip_data = ActivateIPData(file_handler=cleanup_file_handler, file_path=Config.ACTIVATE_IP_FILE_PATH)
+# 使用同一个 file_handler 实例，确保线程锁机制正常工作
+activate_ip_data = ActivateIPData(file_handler=file_handler, file_path=Config.ACTIVATE_IP_FILE_PATH)
 activate_ip_data.start_auto_cleanup(
-    file_handler=cleanup_file_handler,
+    file_handler=file_handler,
     seconds=Config.DATA_RETENTION_SECONDS,
     interval=Config.AUTO_CLEANUP_INTERVAL
 )
