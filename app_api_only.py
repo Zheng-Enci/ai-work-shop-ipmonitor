@@ -71,8 +71,8 @@ def get_data():
     except ValueError:
         return jsonify(APIResponse.bad_request(message='时间戳格式错误，必须是数字')), 400
     
-    # 使用 ActivateIPData 获取时间范围内的数据
-    data = activate_ip_data.get_data_by_time_range(start_time, end_time)
+    # 使用 ActivateIPData 获取时间范围内的 IP 出现次数统计
+    data = activate_ip_data.get_ip_counts_by_time_range(start_time, end_time)
     
     return jsonify(APIResponse.success(data=data, message='查询成功'))
 

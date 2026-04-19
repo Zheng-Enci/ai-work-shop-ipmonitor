@@ -178,7 +178,7 @@ class ActivateIPData:
         cleanup_thread.start()
         print(f"[清理线程] 已启动，每隔 {interval} 秒清理一次超过 {seconds} 秒的数据")
     
-    def get_data_by_time_range(self, start_time: float, end_time: float) -> dict:
+    def get_ip_counts_by_time_range(self, start_time: float, end_time: float) -> dict:
         """
         获取指定时间范围内每个 IP 出现的次数统计
         
