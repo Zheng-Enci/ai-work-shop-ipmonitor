@@ -225,3 +225,35 @@ class ActivateIPData:
             'total_scans': total_scans,
             'ip_counts': dict(ip_counter)
         }
+    
+    def get_scan_count_by_time_range(self, start_time: float, end_time: float) -> int:
+        """
+        获取指定时间范围内的扫描次数
+        
+        统计在 start_time 和 end_time 之间（包含边界）的扫描次数。
+        
+        Args:
+            start_time: 开始时间戳（Unix 时间戳，秒）
+            end_time: 结束时间戳（Unix 时间戳，秒）
+            
+        Returns:
+            int: 该时间范围内的扫描次数
+        """
+        data = self._load_data()
+        scan_count = 0
+        
+        for line in data:
+            parts = line.split()
+            if len(parts) < 1:
+                continue
+            
+            try:
+                timestamp = float(parts[0])
+            except ValueError:
+                continue
+            
+            # 检查时间戳是否在指定范围内
+            if start_time <= timestamp <= end_time:
+                scan_count += 1
+        
+        return scan_count
