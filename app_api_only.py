@@ -5,6 +5,7 @@ AiWorkShop IP 监控系统 - API 版本
 """
 
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 from utils.network_scanner import NetworkScanner
 from utils.file_utils import FileHandler
 from utils.admin_utils import AdminChecker
@@ -16,6 +17,15 @@ from config import Config
 AdminChecker.ensure_admin()
 
 app = Flask(__name__)
+
+# 启用 CORS，允许所有来源访问 API
+CORS(app, resources={
+    r"/api/*": {
+        "origins": "*",
+        "methods": ["GET", "POST", "OPTIONS"],
+        "allow_headers": ["Content-Type"]
+    }
+})
 
 # 创建文件处理器实例
 file_handler = FileHandler(file_path=Config.ACTIVATE_IP_FILE_PATH)
