@@ -178,35 +178,50 @@ class ActivateIPData:
         cleanup_thread.start()
         print(f"[清理线程] 已启动，每隔 {interval} 秒清理一次超过 {seconds} 秒的数据")
     
-    def get_data_by_time_range(self, start_time: float, end_time: float) -> list:
+    def get_data_by_time_range(self, start_time: float, end_time: float) -> dict:
         """
-        获取指定时间范围内的数据
+        获取指定时间范围内每个 IP 出现的次数统计
         
-        返回在 start_time 和 end_time 之间（包含边界）的所有数据行。
+        统计在 start_time 和 end_time 之间（包含边界）所有扫描中，
+        每个 IP 出现的总次数。
         
         Args:
             start_time: 开始时间戳（Unix 时间戳，秒）
             end_time: 结束时间戳（Unix 时间戳，秒）
             
         Returns:
-            list: 符合条件的数据行列表，每行是一个字典包含 timestamp 和 ips
-            例如：[{'timestamp': 1776585378.4079862, 'ips': ['10.0.48.241', '10.0.48.153']}, ...]
+            dict: IP 出现次数统计字典
+            例如：{
+                'total_scans': 10,  # 该时间范围内的扫描次数
+                'ip_counts': {
+                    '10.0.48.241': 10,
+                    '10.0.48.153': 8,
+                    ...
+                }
+            }
         """
         data = self._load_data()
-        result = []
+        ip_counter = Counter()
+        total_scans = 0
         
         for line in data:
             parts = line.split()
             if len(parts) < 2:
                 continue
             
-            timestamp = float(parts[0])
+            try:
+                timestamp = float(parts[0])
+            except ValueError:
+                continue
+            
             # 检查时间戳是否在指定范围内
             if start_time <= timestamp <= end_time:
+                total_scans += 1
                 ips = parts[1:]
-                result.append({
-                    'timestamp': timestamp,
-                    'ips': ips
-                })
+                for ip in ips:
+                    ip_counter[ip] += 1
         
-        return result
+        return {
+            'total_scans': total_scans,
+            'ip_counts': dict(ip_counter)
+        }
