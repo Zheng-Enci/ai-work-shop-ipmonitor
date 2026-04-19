@@ -88,3 +88,52 @@ class ActivateIPData:
                 continue
         
         return scan_count
+    
+    def clean_old_data(self, days: int = 30) -> int:
+        """
+        清理超过指定天数的历史数据
+        
+        删除 activate_ip.txt 文件中时间戳与当前时间差大于指定天数的数据行。
+        
+        Args:
+            days: 天数阈值，默认为 30 天
+            
+        Returns:
+            int: 删除的行数
+        """
+        # 读取所有数据
+        content = self.file_handler.read_file_content(self.file_path)
+        lines = [line.strip() for line in content.split('\n') if line.strip()]
+        
+        # 计算截止时间戳（当前时间减去指定天数）
+        cutoff_time = datetime.now() - timedelta(days=days)
+        cutoff_timestamp = cutoff_time.timestamp()
+        
+        # 保留的新数据列表
+        new_lines = []
+        deleted_count = 0
+        
+        for line in lines:
+            parts = line.split()
+            if len(parts) < 1:
+                continue
+            
+            try:
+                # 解析时间戳
+                timestamp = float(parts[0])
+                # 如果时间戳在截止时间之后，保留该行
+                if timestamp >= cutoff_timestamp:
+                    new_lines.append(line)
+                else:
+                    deleted_count += 1
+            except (ValueError, IndexError):
+                # 如果时间戳格式错误，保留该行（避免误删）
+                new_lines.append(line)
+        
+        # 如果有数据被删除，重写文件
+        if deleted_count > 0:
+            # 将保留的数据写入文件（覆盖原有内容）
+            new_content = '\n'.join(new_lines) + '\n' if new_lines else ''
+            self.file_handler.write_file(self.file_path, new_content, mode='w')
+        
+        return deleted_count
