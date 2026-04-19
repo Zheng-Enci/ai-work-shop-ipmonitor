@@ -27,14 +27,12 @@ class APIResponse:
             dict: 标准化的成功响应字典
             {
                 "code": 200,
-                "success": True,
                 "message": "操作成功",
                 "data": data
             }
         """
         return {
             "code": 200,
-            "success": True,
             "message": message,
             "data": data
         }
@@ -53,14 +51,12 @@ class APIResponse:
             dict: 标准化的错误响应字典
             {
                 "code": 500,
-                "success": False,
                 "message": "操作失败",
                 "data": data
             }
         """
         return {
             "code": code,
-            "success": False,
             "message": message,
             "data": data
         }
