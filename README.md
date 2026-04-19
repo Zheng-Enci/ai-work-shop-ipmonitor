@@ -80,7 +80,9 @@ python app_api_only.py
 
 ## API 接口文档
 
-### 基础信息
+详细的 API 接口文档请查看 [API_DOCUMENTATION.md](./API_DOCUMENTATION.md) 文件。
+
+### 快速参考
 
 - **Base URL**: `http://localhost:5000` 或 `http://10.0.48.241:5000`
 - **响应格式**: JSON
@@ -95,130 +97,12 @@ python app_api_only.py
 
 ### 接口列表
 
-#### 1. 获取 IP 出现次数统计
-
-获取指定时间范围内每个 IP 出现的次数统计。
-
-- **URL**: `/api/ip-counts`
-- **Method**: `GET`
-- **参数**:
-  | 参数名 | 类型 | 必填 | 说明 |
-  |--------|------|------|------|
-  | start_time | float | 是 | 开始时间戳（Unix 时间戳，秒） |
-  | end_time | float | 是 | 结束时间戳（Unix 时间戳，秒） |
-
-- **示例请求**:
-  ```
-  GET http://10.0.48.241:5000/api/ip-counts?start_time=0&end_time=9999999999
-  ```
-
-- **成功响应**:
-  ```json
-  {
-    "code": 200,
-    "message": "查询成功",
-    "data": {
-      "total_scans": 15,
-      "ip_counts": {
-        "10.0.48.241": 15,
-        "10.0.48.153": 12,
-        "10.0.48.154": 10
-      }
-    }
-  }
-  ```
-
-#### 2. 获取扫描次数
-
-获取指定时间范围内的扫描次数。
-
-- **URL**: `/api/scan-count`
-- **Method**: `GET`
-- **参数**:
-  | 参数名 | 类型 | 必填 | 说明 |
-  |--------|------|------|------|
-  | start_time | float | 是 | 开始时间戳（Unix 时间戳，秒） |
-  | end_time | float | 是 | 结束时间戳（Unix 时间戳，秒） |
-
-- **示例请求**:
-  ```
-  GET http://10.0.48.241:5000/api/scan-count?start_time=0&end_time=9999999999
-  ```
-
-- **成功响应**:
-  ```json
-  {
-    "code": 200,
-    "message": "查询成功",
-    "data": {
-      "scan_count": 15
-    }
-  }
-  ```
-
-#### 3. 获取坊内 IP 列表
-
-获取配置中定义的坊内 IP 地址列表。
-
-- **URL**: `/api/fang-ips`
-- **Method**: `GET`
-- **参数**: 无
-
-- **示例请求**:
-  ```
-  GET http://10.0.48.241:5000/api/fang-ips
-  ```
-
-- **成功响应**:
-  ```json
-  {
-    "code": 200,
-    "message": "获取坊内 IP 列表成功",
-    "data": {
-      "fang_ips": ["10.0.48.153", "10.0.48.154", "..."],
-      "count": 47
-    }
-  }
-  ```
-
-#### 4. 获取 IP 范围
-
-获取配置中定义的扫描 IP 范围。
-
-- **URL**: `/api/ip-range`
-- **Method**: `GET`
-- **参数**: 无
-
-- **示例请求**:
-  ```
-  GET http://10.0.48.241:5000/api/ip-range
-  ```
-
-- **成功响应**:
-  ```json
-  {
-    "code": 200,
-    "message": "获取 IP 范围成功",
-    "data": {
-      "ip_range": ["10.0.48.151", "10.0.48.152", "..."],
-      "count": 100,
-      "start_ip": "10.0.48.151",
-      "end_ip": "10.0.48.250"
-    }
-  }
-  ```
-
-### 错误响应
-
-当请求参数错误或发生其他错误时，接口会返回相应的错误信息：
-
-```json
-{
-  "code": 400,
-  "message": "缺少必要参数：start_time 和 end_time",
-  "data": null
-}
-```
+| 接口 | 路径 | 方法 | 说明 |
+|------|------|------|------|
+| IP 出现次数统计 | `/api/ip-counts` | GET | 获取指定时间范围内每个 IP 的出现次数 |
+| 扫描次数 | `/api/scan-count` | GET | 获取指定时间范围内的扫描次数 |
+| 坊内 IP 列表 | `/api/fang-ips` | GET | 获取配置中定义的坊内 IP 地址列表 |
+| IP 范围 | `/api/ip-range` | GET | 获取配置中定义的扫描 IP 范围 |
 
 ## 项目结构
 
