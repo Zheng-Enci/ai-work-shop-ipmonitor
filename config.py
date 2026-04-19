@@ -28,6 +28,7 @@ class Config:
     
     # 数据保留配置
     DATA_RETENTION_SECONDS = 2592000  # 数据保留时间（秒），默认 2592000 秒（30天）
+    AUTO_CLEANUP_INTERVAL = 3600  # 自动清理间隔（秒），默认 3600 秒（1小时）
     
     # Flask 运行配置
     FLASK_HOST = '0.0.0.0'
