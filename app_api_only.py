@@ -9,6 +9,7 @@ from utils.network_scanner import NetworkScanner
 from utils.file_utils import FileHandler
 from utils.admin_utils import AdminChecker
 from utils.stats_utils import ActivateIPData
+from utils.response_utils import APIResponse
 from config import Config
 
 # 确保以管理员身份运行
@@ -52,18 +53,18 @@ def get_data():
     
     # 参数验证
     if not start_time_str or not end_time_str:
-        return jsonify({'error': '缺少必要参数：start_time 和 end_time'}), 400
+        return jsonify(APIResponse.bad_request(message='缺少必要参数：start_time 和 end_time')), 400
     
     try:
         start_time = float(start_time_str)
         end_time = float(end_time_str)
     except ValueError:
-        return jsonify({'error': '时间戳格式错误，必须是数字'}), 400
+        return jsonify(APIResponse.bad_request(message='时间戳格式错误，必须是数字')), 400
     
     # 使用 ActivateIPData 获取时间范围内的数据
     data = activate_ip_data.get_data_by_time_range(start_time, end_time)
     
-    return jsonify(data)
+    return jsonify(APIResponse.success(data=data, message='查询成功'))
 
 
 if __name__ == '__main__':
