@@ -26,6 +26,9 @@ class Config:
     SCAN_INTERVAL = 60  # 扫描间隔（秒），默认 60 秒
     IP_PATTERN = "10.0.48.\\d+"  # IP 查找正则表达式，用于从 ARP 表中匹配 IP 地址
     
+    # 数据保留配置
+    DATA_RETENTION_SECONDS = 2592000  # 数据保留时间（秒），默认 2592000 秒（30天）
+    
     # Flask 运行配置
     FLASK_HOST = '0.0.0.0'
     FLASK_PORT = 5000
