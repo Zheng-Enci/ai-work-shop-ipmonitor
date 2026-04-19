@@ -5,8 +5,11 @@ AiWorkShop IP 监控系统 - 无 Web 界面版本
 import time
 from utils.network_scanner import NetworkScanner
 from utils.file_utils import FileHandler
+from utils.admin_utils import AdminChecker
 from config import Config
 
+# 确保以管理员身份运行
+AdminChecker.ensure_admin()
 
 # 创建文件处理器实例
 file_handler = FileHandler(file_path=Config.ACTIVATE_IP_FILE_PATH)

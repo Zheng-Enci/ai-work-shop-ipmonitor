@@ -2,7 +2,11 @@ from flask import Flask, render_template
 from utils.network_scanner import NetworkScanner
 from utils.stats_utils import ActivateIPData
 from utils.file_utils import FileHandler
+from utils.admin_utils import AdminChecker
 from config import Config
+
+# 确保以管理员身份运行
+AdminChecker.ensure_admin()
 
 app = Flask(__name__)
 
