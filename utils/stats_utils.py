@@ -117,17 +117,13 @@ class ActivateIPData:
             if len(parts) < 1:
                 continue
             
-            try:
-                # 解析时间戳
-                timestamp = float(parts[0])
-                # 如果时间戳在截止时间之后，保留该行
-                if timestamp >= cutoff_timestamp:
-                    new_lines.append(line)
-                else:
-                    deleted_count += 1
-            except (ValueError, IndexError):
-                # 如果时间戳格式错误，保留该行（避免误删）
+            # 解析时间戳
+            timestamp = float(parts[0])
+            # 如果时间戳在截止时间之后，保留该行
+            if timestamp >= cutoff_timestamp:
                 new_lines.append(line)
+            else:
+                deleted_count += 1
         
         # 如果有数据被删除，重写文件
         if deleted_count > 0:
