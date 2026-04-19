@@ -43,19 +43,19 @@ activate_ip_data.start_auto_cleanup(
 )
 
 
-@app.route('/api/data', methods=['GET'])
-def get_data():
+@app.route('/api/ip-counts', methods=['GET'])
+def get_ip_counts():
     """
-    获取指定时间范围内的 IP 扫描数据
+    获取指定时间范围内的 IP 出现次数统计
     
-    通过 GET 请求传入开始时间戳和结束时间戳，返回该时间范围内的所有数据。
+    通过 GET 请求传入开始时间戳和结束时间戳，返回该时间范围内每个 IP 出现的次数统计。
     
     请求参数:
         start_time: 开始时间戳（Unix 时间戳，秒）
         end_time: 结束时间戳（Unix 时间戳，秒）
     
     Returns:
-        JSON 格式的 IP 扫描数据列表
+        JSON 格式的 IP 出现次数统计，包含 total_scans 和 ip_counts
     """
     # 获取请求参数
     start_time_str = request.args.get('start_time')
