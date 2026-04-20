@@ -10,12 +10,11 @@ class FileHandler:
         self._file_lock = threading.Lock()
         self._file_path = file_path
     
-    def write_file(self, filepath: str, content: str, mode: str = 'a+', encoding: str = 'utf-8') -> None:
+    def write_file(self, content: str, mode: str = 'a+', encoding: str = 'utf-8') -> None:
         """
         线程安全的文件写入
         
         Args:
-            filepath: 文件路径
             content: 要写入的内容
             mode: 文件打开模式，默认为 'a+'（追加模式）
             encoding: 文件编码，默认为 'utf-8'
@@ -25,19 +24,18 @@ class FileHandler:
                 f.write(content)
                 f.flush()  # 确保数据立即写入磁盘
     
-    def read_file_content(self, filepath: str, encoding: str = 'utf-8-sig') -> str:
+    def read_file_content(self, encoding: str = 'utf-8-sig') -> str:
         """
         线程安全的文件读取（返回完整内容字符串）
         
         Args:
-            filepath: 文件路径
             encoding: 文件编码，默认为 'utf-8-sig'
         
         Returns:
             str: 文件的完整内容
         """
         with self._file_lock:
-            if not os.path.exists(filepath):
+            if not os.path.exists(self._file_path):
                 return ''
-            with open(filepath, 'r', encoding = encoding) as f:
+            with open(self._file_path, 'r', encoding = encoding) as f:
                 return f.read()
