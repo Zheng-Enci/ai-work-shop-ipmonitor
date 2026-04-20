@@ -23,7 +23,7 @@ class Config:
     IP_RANGE = list(range(151, 251))
     
     # 网络扫描配置
-    SCAN_INTERVAL = 60  # 扫描间隔（秒），默认 60 秒
+    SCAN_INTERVAL = 480  # 扫描间隔（秒），默认 8 分钟 = 480 秒
     IP_PATTERN = "10.0.48.\\d+"  # IP 查找正则表达式，用于从 ARP 表中匹配 IP 地址
     
     # 数据保留配置
