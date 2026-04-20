@@ -9,6 +9,7 @@ class FileHandler:
         """初始化文件处理器，创建文件锁"""
         self._file_lock = threading.Lock()
         self._file_path = file_path
+        self._content = ""  # 存储文件内容
     
     def write_file(self, content: str, mode: str = 'a+', encoding: str = 'utf-8') -> None:
         """
@@ -27,6 +28,7 @@ class FileHandler:
     def read_file_content(self, encoding: str = 'utf-8-sig') -> str:
         """
         线程安全的文件读取（返回完整内容字符串）
+        如果缓存内容为空，则从文件读取并缓存；否则直接返回缓存内容
         
         Args:
             encoding: 文件编码，默认为 'utf-8-sig'
@@ -34,8 +36,12 @@ class FileHandler:
         Returns:
             str: 文件的完整内容
         """
+        # 如果缓存内容不为空，直接返回缓存内容（无需加锁）
+        if self._content:
+            return self._content
+        
+        # 缓存为空，需要加锁后从文件读取
         with self._file_lock:
-            if not os.path.exists(self._file_path):
-                return ''
             with open(self._file_path, 'r', encoding = encoding) as f:
-                return f.read()
+                self._content = f.read()
+                return self._content
