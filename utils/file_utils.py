@@ -24,6 +24,11 @@ class FileHandler:
             with open(self._file_path, mode, encoding = encoding) as f:
                 f.write(content)
                 f.flush()  # 确保数据立即写入磁盘
+            # 更新缓存：追加模式时追加内容，覆盖模式时替换内容
+            if 'a' in mode:
+                self._content += content
+            else:
+                self._content = content
     
     def read_file_content(self, encoding: str = 'utf-8-sig') -> str:
         """
